@@ -7,10 +7,11 @@ A RichText Editor component for Vaadin Flow using the open source Quill Editor l
 Add the quill-editor dependency to your pom.xml:
 
 ```xml
+
 <dependency>
-   <groupId>org.vaadin.klaudeta</groupId>
-   <artifactId>quill-editor</artifactId>
-   <version>1.0.0</version>
+    <groupId>org.vaadin.schoningorg.vaadin.schoning</groupId>
+    <artifactId>quill-editor</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
 Do not forget to add the `vaadin-addons` repository:

@@ -1,15 +1,14 @@
-package org.vaadin.klaudeta.quill;
+package org.vaadin.schoning.quill;
 
 import com.vaadin.flow.component.AbstractCompositeField;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasValidation;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
-import org.apache.commons.lang3.StringUtils;
 
-import static org.vaadin.klaudeta.quill.QuillEditorComponent.EMPTY_VALUE;
+import static org.vaadin.schoning.quill.QuillEditorComponent.EMPTY_HTML_VALUE;
 
-public class QuillEditor extends AbstractCompositeField<Div, QuillEditor, String> implements HasValidation, HasSize {
+public class QuillHtmlEditor extends AbstractCompositeField<Div, QuillHtmlEditor, String> implements HasValidation, HasSize {
     private Span errorMessageLabel = new Span();
     private boolean invalid;
 
@@ -17,13 +16,13 @@ public class QuillEditor extends AbstractCompositeField<Div, QuillEditor, String
 
     private Div htmlContent = new Div();
 
-    public QuillEditor() {
-        super(EMPTY_VALUE);
+    public QuillHtmlEditor() {
+        super(EMPTY_HTML_VALUE);
 
         getContent().add(errorMessageLabel, quillEditorComponent, htmlContent);
         htmlContent.addClassNames("ql-container", "ql-snow", "ql-readonly");
         htmlContent.setVisible(false);
-        quillEditorComponent.addValueChangeListener(quillValueChangeEvent -> {
+        quillEditorComponent.addHtmlValueChangeListener(quillValueChangeEvent -> {
             setValue(quillValueChangeEvent.getValue());
         });
 
@@ -31,6 +30,15 @@ public class QuillEditor extends AbstractCompositeField<Div, QuillEditor, String
         errorMessageLabel.addClassName("error-message");
         errorMessageLabel.setVisible(false);
         quillEditorComponent.setHeight("90%");
+
+        // Hack to ensure content displays on page refresh or when component is opened in a dialog and the dialog is closed and then opened again
+        quillEditorComponent.addAttachListener(e -> {
+            getToolbarConfigurator().initEditor();
+            quillEditorComponent.getElement().getNode().runWhenAttached(ui -> {
+                quillEditorComponent.getElement().executeJs("$0.setHtml($1)", quillEditorComponent.getElement(),  getValue());
+            });
+        });
+
     }
 
     @Override
@@ -38,6 +46,10 @@ public class QuillEditor extends AbstractCompositeField<Div, QuillEditor, String
         _setValueBasedOnReadOnly(newPresentationValue, isReadOnly());
     }
 
+    //@Override
+    //public String getValue(){
+    //    return quillEditorComponent.getHtmlContent();
+    //}
     @Override
     public void clear() {
         super.clear();
@@ -95,6 +107,10 @@ public class QuillEditor extends AbstractCompositeField<Div, QuillEditor, String
 
     public QuillToolbarConfigurator getToolbarConfigurator(){
         return quillEditorComponent;
+    }
+
+    public void initEditor() {
+        quillEditorComponent.initEditor();
     }
 
 }

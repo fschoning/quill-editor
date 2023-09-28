@@ -2,30 +2,43 @@ import { LitElement, html, css } from "lit-element";
 import Quill from 'quill';
 
 const Parchment = Quill.import('parchment');
+
 const DirectionAttribute = Quill.import('attributors/attribute/direction');
 Quill.register(DirectionAttribute, true);
+
 const AlignClass = Quill.import('attributors/class/align');
 Quill.register(AlignClass, true);
+
 const BackgroundClass = Quill.import('attributors/class/background');
 Quill.register(BackgroundClass, true);
+
 const ColorClass = Quill.import('attributors/class/color');
 Quill.register(ColorClass, true);
+
 const DirectionClass = Quill.import('attributors/class/direction');
 Quill.register(DirectionClass, true);
+
 const FontClass = Quill.import('attributors/class/font');
 Quill.register(FontClass, true);
+
 const SizeClass = Quill.import('attributors/class/size');
 Quill.register(SizeClass, true);
+
 const AlignStyle = Quill.import('attributors/style/align');
 Quill.register(AlignStyle, true);
+
 const BackgroundStyle = Quill.import('attributors/style/background');
 Quill.register(BackgroundStyle, true);
+
 const ColorStyle = Quill.import('attributors/style/color');
 Quill.register(ColorStyle, true);
+
 const DirectionStyle = Quill.import('attributors/style/direction');
 Quill.register(DirectionStyle, true);
+
 const FontStyle = Quill.import('attributors/style/font');
 Quill.register(FontStyle, true);
+
 const SizeStyle = Quill.import('attributors/style/size');
 Quill.register(SizeStyle, true);
 
@@ -66,6 +79,9 @@ class QuillEditor extends LitElement{
             withColors: {type: Boolean},
             withFonts: {type: Boolean},
             withAligns: {type: Boolean},
+            withLinks: {type: Boolean},
+            withVideos: {type: Boolean},
+            withImages: {type: Boolean},
             withCleanFormat: {type: Boolean}
         }
     }
@@ -85,6 +101,9 @@ class QuillEditor extends LitElement{
         this.withFonts = true;
         this.withAligns = true;
         this.withCleanFormat = true;
+        this.withLinks = true;
+        this.withVideos = true;
+        this.withImages = true;
 
         this.fontDecorators = ['bold', 'italic', 'underline', 'strike'];
         this.codeBlocks = ['blockquote', 'code-block'];
@@ -98,12 +117,27 @@ class QuillEditor extends LitElement{
         this.colors = [{ 'color': [] }, { 'background': [] }];
         this.fonts =  [{ 'font': [] }];
         this.aligns = [{ 'align': [] }];
+        this.links = ['link'];
+        this.videos = ['video'];
+        this.images = ['image'];
         this.cleanFormat = ['clean'];
 
         this.toolbarOptions = [
-            this.fontDecorators, this.blockCodes, this.mainHeaders, this.lists, this.scripts, this.indents,
-            this.directions, this.sizes, this.headers, this.colors, this.fonts,
-            this.aligns, this.cleanFormat
+            this.fontDecorators,
+            this.mainHeaders,
+            this.headers,
+            this.scripts,
+            this.sizes,
+            this.fonts,
+            this.colors,
+            this.lists,
+            this.aligns,
+            this.indents,
+            this.links,
+            this.images,
+            this.videos,
+            this.blockCodes,
+            this.cleanFormat
         ];
 
         let IndentStyle = new IndentAttributor('indent', 'text-indent', {
@@ -164,6 +198,15 @@ class QuillEditor extends LitElement{
         if(this.withAligns){
             options.push(this.aligns);
         }
+        if(this.withLinks){
+            options.push(this.links);
+        }
+        if(this.withImages){
+            options.push(this.images);
+        }
+        if(this.withVideos){
+            options.push(this.videos);
+        }
         if(this.withCleanFormat){
             options.push(this.cleanFormat);
         }
@@ -179,16 +222,28 @@ class QuillEditor extends LitElement{
         const thisThat = this;
 
         this.quillEditor.on('text-change', function(delta, oldDelta, source) {
+            //console.log('text-change:' + JSON.stringify(thisThat.quillEditor.getContents()));
             thisThat.$server.setHtml(thisThat.quillEditor.root.innerHTML);
+            thisThat.$server.setContent(JSON.stringify(thisThat.quillEditor.getContents()));
         });
 
     }
 
+    getContent() {
+        return JSON.stringify(this.quillEditor.getContents());
+    }
+
+    setContent(deltaContent) {
+        this.quillEditor.setContents(JSON.parse(deltaContent));
+    }
+
     getHtml() {
+        //console.log('getHtml:' + this.quillEditor.root.innerHTML);
         return this.quillEditor.root.innerHTML;
     }
 
     setHtml(htmlContent) {
+        //console.log('setHtml:' + htmlContent);
         this.quillEditor.root.innerHTML = htmlContent;
     }
 }

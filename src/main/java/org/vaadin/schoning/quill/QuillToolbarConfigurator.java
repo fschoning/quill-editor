@@ -1,4 +1,4 @@
-package org.vaadin.klaudeta.quill;
+package org.vaadin.schoning.quill;
 
 import com.vaadin.flow.component.HasElement;
 
@@ -16,6 +16,9 @@ public interface QuillToolbarConfigurator extends HasElement {
     String colors = "withColors";
     String fonts = "withFonts";
     String aligns = "withAligns";
+    String links = "withLinks";
+    String images = "withImages";
+    String videos = "withVideos";
     String cleanFormats = "withCleanFormats";
 
 
@@ -149,6 +152,36 @@ public interface QuillToolbarConfigurator extends HasElement {
      */
     default QuillToolbarConfigurator noCleanFormat(){
         getElement().setProperty(cleanFormats, false);
+        return this;
+    }
+
+    /**
+     * Configuring the editor to not include the hyperlink option
+     *
+     * @return this instance of the {@link QuillEditorComponent} as a QuillToolbarConfiguration
+     */
+    default QuillToolbarConfigurator noLinks(){
+        getElement().setProperty(links, false);
+        return this;
+    }
+
+    /**
+     * Configuring the editor to not include the image option:
+     *
+     * @return this instance of the {@link QuillEditorComponent} as a QuillToolbarConfiguration
+     */
+    default QuillToolbarConfigurator noImages(){
+        getElement().setProperty(images, false);
+        return this;
+    }
+
+    /**
+     * Configuring the editor to not include the video option:
+     *
+     * @return this instance of the {@link QuillEditorComponent} as a QuillToolbarConfiguration
+     */
+    default QuillToolbarConfigurator noVideos(){
+        getElement().setProperty(videos, false);
         return this;
     }
 

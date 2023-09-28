@@ -1,4 +1,4 @@
-package org.vaadin.klaudeta.quill;
+package org.vaadin.schoning.quill;
 
 import java.util.Objects;
 
@@ -15,6 +15,8 @@ import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.dom.DisabledUpdateMode;
 import com.vaadin.flow.function.SerializableConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A custom RichText editor component for Flow using Quill library.
@@ -22,16 +24,20 @@ import com.vaadin.flow.function.SerializableConsumer;
 @Tag("quill-editor")
 @NpmPackage(value = "lit-element", version = "^2.2.1")
 @NpmPackage(value = "lit-html", version = "^1.1.2")
-@NpmPackage(value = "quill", version = "^1.3.6")
+@NpmPackage(value = "quill", version = "^1.3.7")
 @JsModule("./quilleditor.js")
 @CssImport("./quill.snow.css")
 @CssImport("./custom-quillEditor.css")
 public class QuillEditorComponent extends Component implements HasComponents, QuillToolbarConfigurator, HasSize, QuillValueChangeNotifier, HasStyle {
 
-    public static final String EMPTY_VALUE = "<p><br></p>";
+    private static Logger log = LoggerFactory.getLogger(QuillEditorComponent.class);
+
+    public static final String EMPTY_HTML_VALUE = "<p><br></p>";
+    public static final String EMPTY_DELTA_VALUE = "";
 
     private Div editor = new Div();
     private String htmlContent = "";
+    private String deltaContent = "";
 
     public QuillEditorComponent() {
         initEditor();
@@ -53,11 +59,22 @@ public class QuillEditorComponent extends Component implements HasComponents, Qu
 
     @ClientCallable(DisabledUpdateMode.ALWAYS)
     private void setHtml(String htmlContent) {
+        //log.debug("setHtml: htmlContent={}", htmlContent);
         final String noNewLineCharacter = htmlContent.replaceAll("\n", "");
         final String oldContent = this.htmlContent;
         if(!Objects.equals(oldContent, noNewLineCharacter)){
             this.htmlContent = noNewLineCharacter;
-            this.fireEvent(new QuillValueChangeNotifier.QuillValueChangeEvent(this, noNewLineCharacter));
+            this.fireEvent(new QuillValueChangeNotifier.QuillHtmlValueChangeEvent(this, noNewLineCharacter));
+        }
+    }
+
+    @ClientCallable(DisabledUpdateMode.ALWAYS)
+    private void setContent(String deltaContent) {
+        //log.debug("setContent: deltaContent={}", deltaContent);
+        final String oldContent = this.deltaContent;
+        if(!Objects.equals(oldContent, deltaContent)){
+            this.deltaContent = deltaContent;
+            this.fireEvent(new QuillValueChangeNotifier.QuillDeltaValueChangeEvent(this, deltaContent));
         }
     }
 
@@ -84,6 +101,20 @@ public class QuillEditorComponent extends Component implements HasComponents, Qu
             this.htmlContent = htmlContent;
             runBeforeClientResponse(ui -> {
                 editor.getElement().executeJs("$0.setHtml($1)", this,  htmlContent);
+            });
+        }
+    }
+
+    public String getDeltaContent(){
+        return deltaContent;
+    }
+
+    public void setDeltaContent(String deltaContent){
+        final String oldContent = this.deltaContent;
+        if(!Objects.equals(oldContent, deltaContent)){
+            this.deltaContent = deltaContent;
+            runBeforeClientResponse(ui -> {
+                editor.getElement().executeJs("$0.setContent($1)", this,  deltaContent);
             });
         }
     }
