@@ -10,7 +10,7 @@
     <description>RichText Editor for Vaadin using Quill library</description>
 
     <properties>
-        <vaadin.version>23.3.22</vaadin.version>
+        <vaadin.version>23.3.25</vaadin.version>
 
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -18,7 +18,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     <organization>
-        <name>Klaudeta Mertiku</name>
+        <name>Klaudeta Mertiku / Franz Schöning</name>
     </organization>
     <licenses>
         <license>
